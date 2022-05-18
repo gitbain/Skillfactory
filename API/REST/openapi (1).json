@@ -1,0 +1,4692 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "PIZZA API",
+    "description": "Это API создано работы с ресурсом пользователя, курьера, повара, оператора, корзины, товара, топинга, заказа, остатков и платежей",
+    "version": "2.5",
+    "contact": {
+      "name": "pizzeria",
+      "email": "pizzeria@gmail.com",
+      "url": "https://pizzeria.com/api"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.pizzeria.com/data/2.5/v1/",
+      "variables": {
+        "region": {
+          "default": "rus"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/user": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Вызвать пользователя",
+        "description": "",
+        "operationId": "getuser",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/filter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/users"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/users"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "user not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Добавить пользователя",
+        "description": "Это может сделать только администратор",
+        "operationId": "postuser",
+        "requestBody": {
+          "description": "Пользователь, который должен быть добавлен",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/user_rb"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/user"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/user"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/login": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Регистрирует пользователя в системе",
+        "description": "",
+        "operationId": "loguser",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "description": "The user name for login",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/user/properties/username"
+            }
+          },
+          {
+            "name": "password",
+            "in": "query",
+            "description": "The password for login in clear text",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/user/properties/password"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            },
+            "headers": {
+              "X-RateLimit-Limit": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "description": "Лимит запросов в час"
+              },
+              "X-RateLimit-Expires": {
+                "schema": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "description": "Дата по текущему времени Гринвича, когда истечет срок действия токена"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid username/password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/logout": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Выход из текущего сеанса пользователя, вошедшего в систему",
+        "description": "",
+        "operationId": "logoutuser",
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/user/{userId}": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Вызвать пользователя по id",
+        "description": "",
+        "operationId": "getuserid",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the user to fetch",
+            "schema": {
+              "$ref": "#/components/schemas/user/properties/id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/user"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "user not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Заменить пользователя",
+        "operationId": "putuser",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the user to update",
+            "schema": {
+              "$ref": "#/components/schemas/user/properties/id"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Пользователь, который должен быть изменен",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/user_rb"
+              }
+            },
+            "application?xml": {
+              "schema": {
+                "$ref": "#/components/schemas/user_rb"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/user"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "user was not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Обновить пользователя",
+        "operationId": "patchuser",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the user to patch",
+            "schema": {
+              "$ref": "#/components/schemas/user/properties/id"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Пользователь, который должен быть частично изменен",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/user_rb"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/user_rb"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/user"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "user was not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Удалить пользователя",
+        "operationId": "deleteuser",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the user to delete",
+            "schema": {
+              "$ref": "#/components/schemas/user/properties/id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "user was not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/deliveryman": {
+      "get": {
+        "tags": [
+          "deliveryman"
+        ],
+        "summary": "Вызвать курьера",
+        "description": "",
+        "operationId": "getdeliveryman",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/filter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/deliverymen"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/deliverymen"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "deliveryman not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "deliveryman"
+        ],
+        "summary": "Добавить курьера",
+        "description": "Это может сделать только администратор",
+        "operationId": "postdeliveryman",
+        "requestBody": {
+          "description": "Курьер, который должен быть добавлен",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/deliveryman_rb"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/deliveryman_rb"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/deliveryman"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/deliveryman"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/deliveryman/login": {
+      "get": {
+        "tags": [
+          "deliveryman"
+        ],
+        "summary": "Регистрирует курьера в системе",
+        "description": "",
+        "operationId": "logdeliveryman",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "description": "The deliveryman name for login",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/deliveryman/properties/username"
+            }
+          },
+          {
+            "name": "password",
+            "in": "query",
+            "description": "The password for login in clear text",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/deliveryman/properties/password"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            },
+            "headers": {
+              "X-RateLimit-Limit": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "description": "Лимит запросов в час"
+              },
+              "X-RateLimit-Expires": {
+                "schema": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "description": "Дата по текущему времени Гринвича, когда истечет срок действия токена"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid username/password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/deliveryman/logout": {
+      "get": {
+        "tags": [
+          "deliveryman"
+        ],
+        "summary": "Выход из текущего сеанса курьера, вошедшего в систему",
+        "description": "",
+        "operationId": "logoutdeliveryman",
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/deliveryman/{deliverymanId}": {
+      "get": {
+        "tags": [
+          "deliveryman"
+        ],
+        "summary": "Вызвать курьера по id",
+        "description": "",
+        "operationId": "getdeliverymanid",
+        "parameters": [
+          {
+            "name": "deliverymanId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the deliveryman to fetch",
+            "schema": {
+              "$ref": "#/components/schemas/deliveryman/properties/id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/deliveryman"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/deliveryman"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "deliveryman not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "deliveryman"
+        ],
+        "summary": "Заменить курьера",
+        "operationId": "putdeliveryman",
+        "parameters": [
+          {
+            "name": "deliverymanId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the deliveryman to update",
+            "schema": {
+              "$ref": "#/components/schemas/deliveryman/properties/id"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Курьер, который должен быть изменен",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/deliveryman_rb"
+              }
+            },
+            "application?xml": {
+              "schema": {
+                "$ref": "#/components/schemas/deliveryman_rb"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/deliveryman"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/deliveryman"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "deliveryman was not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "deliveryman"
+        ],
+        "summary": "Обновить курьера",
+        "operationId": "patchdeliveryman",
+        "parameters": [
+          {
+            "name": "deliverymanId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the deliveryman to patch",
+            "schema": {
+              "$ref": "#/components/schemas/deliveryman/properties/id"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Курьер, который должен быть частично изменен",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/deliveryman_rb"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/deliveryman_rb"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/deliveryman"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/deliveryman"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "deliveryman was not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "deliveryman"
+        ],
+        "summary": "Удалить курьера",
+        "operationId": "deletedeliveryman",
+        "parameters": [
+          {
+            "name": "deliverymanId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the deliveryman to delete",
+            "schema": {
+              "$ref": "#/components/schemas/deliveryman/properties/id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "deliveryman was not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chef": {
+      "get": {
+        "tags": [
+          "chef"
+        ],
+        "summary": "Вызвать повара",
+        "description": "",
+        "operationId": "getchef",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/filter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/chefs"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/chefs"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "chef not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "chef"
+        ],
+        "summary": "Добавить повара",
+        "description": "Это может сделать только администратор",
+        "operationId": "postchef",
+        "requestBody": {
+          "description": "Повар, который должен быть добавлен",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/chef_rb"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/chef_rb"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/chef"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/chef"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chef/login": {
+      "get": {
+        "tags": [
+          "chef"
+        ],
+        "summary": "Регистрирует повара в системе",
+        "description": "",
+        "operationId": "logchef",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "description": "The chef name for login",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/chef/properties/username"
+            }
+          },
+          {
+            "name": "password",
+            "in": "query",
+            "description": "The password for login in clear text",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/chef/properties/password"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            },
+            "headers": {
+              "X-RateLimit-Limit": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "description": "Лимит запросов в час"
+              },
+              "X-RateLimit-Expires": {
+                "schema": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "description": "Дата по текущему времени Гринвича, когда истечет срок действия токена"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid username/password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chef/logout": {
+      "get": {
+        "tags": [
+          "chef"
+        ],
+        "summary": "Выход из текущего сеанса повара, вошедшего в систему",
+        "description": "",
+        "operationId": "logoutchef",
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/chef/{chefId}": {
+      "get": {
+        "tags": [
+          "chef"
+        ],
+        "summary": "Вызвать повара по id",
+        "description": "",
+        "operationId": "getchefid",
+        "parameters": [
+          {
+            "name": "chefId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the chef to fetch",
+            "schema": {
+              "$ref": "#/components/schemas/chef/properties/id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/chef"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/chef"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "chef not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "chef"
+        ],
+        "summary": "Заменить повара",
+        "operationId": "putchef",
+        "parameters": [
+          {
+            "name": "chefId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the chef to update",
+            "schema": {
+              "$ref": "#/components/schemas/chef/properties/id"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Повар, который должен быть изменен",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/chef_rb"
+              }
+            },
+            "application?xml": {
+              "schema": {
+                "$ref": "#/components/schemas/chef_rb"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/chef"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/chef"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "chef not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "chef"
+        ],
+        "summary": "Обновить повара",
+        "operationId": "patchchef",
+        "parameters": [
+          {
+            "name": "chefId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the chef to patch",
+            "schema": {
+              "$ref": "#/components/schemas/chef/properties/id"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Повар, который должен быть частично изменен",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/chef_rb"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/chef_rb"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/chef"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/chef"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "chef not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "chef"
+        ],
+        "summary": "Удалить повара",
+        "operationId": "deletechef",
+        "parameters": [
+          {
+            "name": "chefId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the chef to delete",
+            "schema": {
+              "$ref": "#/components/schemas/chef/properties/id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "chef not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operator": {
+      "get": {
+        "tags": [
+          "operator"
+        ],
+        "summary": "Вызвать оператора",
+        "description": "",
+        "operationId": "getoperator",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/filter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/operators"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/operators"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "operator not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "operator"
+        ],
+        "summary": "Добавить оператора",
+        "description": "Это может сделать только администратор",
+        "operationId": "postoperator",
+        "requestBody": {
+          "description": "Оператор, который должен быть добавлен",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/operator_rb"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/operator_rb"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/operator"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/operator"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operator/login": {
+      "get": {
+        "tags": [
+          "operator"
+        ],
+        "summary": "Регистрирует оператора в системе",
+        "description": "",
+        "operationId": "logoperator",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "description": "The operator name for login",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/operator/properties/username"
+            }
+          },
+          {
+            "name": "password",
+            "in": "query",
+            "description": "The password for login in clear text",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/operator/properties/password"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            },
+            "headers": {
+              "X-RateLimit-Limit": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "description": "Лимит запросов в час"
+              },
+              "X-RateLimit-Expires": {
+                "schema": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "description": "Дата по текущему времени Гринвича, когда истечет срок действия токена"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid username/password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operator/logout": {
+      "get": {
+        "tags": [
+          "operator"
+        ],
+        "summary": "Выход из текущего сеанса оператора, вошедшего в систему",
+        "description": "",
+        "operationId": "logoutoperator",
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/operator/{operatorId}": {
+      "get": {
+        "tags": [
+          "operator"
+        ],
+        "summary": "Вызвать оператора по id",
+        "description": "",
+        "operationId": "getoperatorid",
+        "parameters": [
+          {
+            "name": "operatorId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the operator to fetch",
+            "schema": {
+              "$ref": "#/components/schemas/operator/properties/id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/operator"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/operator"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "operator not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "operator"
+        ],
+        "summary": "Заменить оператора",
+        "operationId": "putoperator",
+        "parameters": [
+          {
+            "name": "operatorId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the operator to update",
+            "schema": {
+              "$ref": "#/components/schemas/operator/properties/id"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Оператор, который должен быть изменен",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/operator_rb"
+              }
+            },
+            "application?xml": {
+              "schema": {
+                "$ref": "#/components/schemas/operator_rb"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/operator"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/operator"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "operator not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "operator"
+        ],
+        "summary": "Обновить оператора",
+        "operationId": "patchoperator",
+        "parameters": [
+          {
+            "name": "operatorId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the operator to patch",
+            "schema": {
+              "$ref": "#/components/schemas/operator/properties/id"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Оператор, который должен быть частично изменен",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/operator_rb"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/operator_rb"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/operator"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/operator"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "operator not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "operator"
+        ],
+        "summary": "Удалить оператора",
+        "operationId": "deleteoperator",
+        "parameters": [
+          {
+            "name": "operatorId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the operator to delete",
+            "schema": {
+              "$ref": "#/components/schemas/operator/properties/id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "operator not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cart": {
+      "get": {
+        "tags": [
+          "cart"
+        ],
+        "summary": "Вызвать корзину",
+        "description": "",
+        "operationId": "getcart",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/filter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/carts"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/carts"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "cart not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "cart"
+        ],
+        "summary": "Добавить корзину",
+        "description": "Это может сделать только администратор",
+        "operationId": "postcart",
+        "requestBody": {
+          "description": "Корзина, которая должена быть добавлена",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/cart_rb"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/cart_rb"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/cart"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/cart"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cart/{cartId}": {
+      "get": {
+        "tags": [
+          "cart"
+        ],
+        "summary": "Вызвать корзину по id",
+        "description": "",
+        "operationId": "getcartid",
+        "parameters": [
+          {
+            "name": "cartId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the cart to fetch",
+            "schema": {
+              "$ref": "#/components/schemas/cart/properties/id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/cart"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/cart"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "cart not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "cart"
+        ],
+        "summary": "Заменить корзину",
+        "operationId": "putcart",
+        "parameters": [
+          {
+            "name": "cartId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the cart to update",
+            "schema": {
+              "$ref": "#/components/schemas/cart/properties/id"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Козина, которая должена быть изменена",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/cart_rb"
+              }
+            },
+            "application?xml": {
+              "schema": {
+                "$ref": "#/components/schemas/cart_rb"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/carts"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/carts"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "cart not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "cart"
+        ],
+        "summary": "Обновить корзину",
+        "operationId": "patchcart",
+        "parameters": [
+          {
+            "name": "cartId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the cart to patch",
+            "schema": {
+              "$ref": "#/components/schemas/cart/properties/id"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Корзина, которая должена быть частично изменена",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/cart_rb"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/cart_rb"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/carts"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/carts"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "cart not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "cart"
+        ],
+        "summary": "Удалить корзину",
+        "operationId": "deletecart",
+        "parameters": [
+          {
+            "name": "cartId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the cart to delete",
+            "schema": {
+              "$ref": "#/components/schemas/cart/properties/id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "cart not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/product": {
+      "get": {
+        "tags": [
+          "product"
+        ],
+        "summary": "Вызвать продукт",
+        "description": "",
+        "operationId": "getproduct",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/filter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/products"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/products"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "product not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "product"
+        ],
+        "summary": "Добавить продукт",
+        "description": "Это может сделать только администратор",
+        "operationId": "postproduct",
+        "requestBody": {
+          "description": "Продукт, который должен быть добавлен",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/product_rb"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/product_rb"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/product"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/product"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/product/{productId}": {
+      "get": {
+        "tags": [
+          "product"
+        ],
+        "summary": "Вызвать продукт по id",
+        "description": "",
+        "operationId": "getproductid",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the product to fetch",
+            "schema": {
+              "$ref": "#/components/schemas/product/properties/id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/product"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/product"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "product not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "product"
+        ],
+        "summary": "Заменить продукт",
+        "operationId": "putproduct",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the product to update",
+            "schema": {
+              "$ref": "#/components/schemas/product/properties/id"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Продукт, который должен быть изменен",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/product_rb"
+              }
+            },
+            "application?xml": {
+              "schema": {
+                "$ref": "#/components/schemas/product_rb"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/product"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/product"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "product not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "product"
+        ],
+        "summary": "Обновить продукт",
+        "operationId": "patchproduct",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the product to patch",
+            "schema": {
+              "$ref": "#/components/schemas/product/properties/id"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Продукт, который должен быть частично изменен",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/product_rb"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/product_rb"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/product"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/product"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "product not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "product"
+        ],
+        "summary": "Удалить продукт",
+        "operationId": "deleteproduct",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the product to delete",
+            "schema": {
+              "$ref": "#/components/schemas/product/properties/id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "product not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/topping": {
+      "get": {
+        "tags": [
+          "topping"
+        ],
+        "summary": "Вызвать топпинг",
+        "description": "",
+        "operationId": "gettopping",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/filter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/toppings"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/toppings"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "topping not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "topping"
+        ],
+        "summary": "Добавить топпинг",
+        "description": "Это может сделать только администратор",
+        "operationId": "posttopping",
+        "requestBody": {
+          "description": "Топпинг, который должен быть добавлен",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/topping_rb"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/topping_rb"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/topping"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/topping"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/topping/{toppingId}": {
+      "get": {
+        "tags": [
+          "topping"
+        ],
+        "summary": "Вызвать топпинг по id",
+        "description": "",
+        "operationId": "gettoppingid",
+        "parameters": [
+          {
+            "name": "toppingId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the topping to fetch",
+            "schema": {
+              "$ref": "#/components/schemas/topping/properties/id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/topping"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/topping"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "topping not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "topping"
+        ],
+        "summary": "Заменить топпинг",
+        "operationId": "puttopping",
+        "parameters": [
+          {
+            "name": "toppingId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the topping to update",
+            "schema": {
+              "$ref": "#/components/schemas/topping/properties/id"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Топпинг, который должен быть изменен",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/topping_rb"
+              }
+            },
+            "application?xml": {
+              "schema": {
+                "$ref": "#/components/schemas/topping_rb"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/topping"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/topping"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "topping not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "topping"
+        ],
+        "summary": "Удалить топпинг",
+        "operationId": "deletetopping",
+        "parameters": [
+          {
+            "name": "toppingId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the topping to delete",
+            "schema": {
+              "$ref": "#/components/schemas/topping/properties/id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "topping not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/order": {
+      "get": {
+        "tags": [
+          "order"
+        ],
+        "summary": "Вызвать заказ",
+        "description": "",
+        "operationId": "getorder",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/filter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/orders"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/orders"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "order not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "order"
+        ],
+        "summary": "Добавить заказ",
+        "description": "",
+        "operationId": "postorder",
+        "requestBody": {
+          "description": "Заказ, который должен быть добавлен",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/order_rb"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/order_rb"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/order"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/order"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/order/{orderId}": {
+      "get": {
+        "tags": [
+          "order"
+        ],
+        "summary": "Вызвать заказ по id",
+        "description": "",
+        "operationId": "getorderid",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the order to fetch",
+            "schema": {
+              "$ref": "#/components/schemas/order/properties/id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/orders"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/orders"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "order not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "order"
+        ],
+        "summary": "Заменить заказ",
+        "operationId": "putorder",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the order to update",
+            "schema": {
+              "$ref": "#/components/schemas/order/properties/id"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Заказ, который должен быть изменен",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/order_rb"
+              }
+            },
+            "application?xml": {
+              "schema": {
+                "$ref": "#/components/schemas/order_rb"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/orders"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/orders"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "order not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "order"
+        ],
+        "summary": "Обновить заказ",
+        "operationId": "patchorder",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the order to patch",
+            "schema": {
+              "$ref": "#/components/schemas/order/properties/id"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Заказ, который должен быть частично изменен",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/order_rb"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/order_rb"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/orders"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/orders"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "order not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "order"
+        ],
+        "summary": "Удалить заказ",
+        "operationId": "deleteorder",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the order to delete",
+            "schema": {
+              "$ref": "#/components/schemas/order/properties/id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "order not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stock": {
+      "get": {
+        "tags": [
+          "stock"
+        ],
+        "summary": "Вызвать остатки",
+        "description": "",
+        "operationId": "getstock",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/filter"
+          },
+          {
+            "$ref": "#/components/parameters/date_from"
+          },
+          {
+            "$ref": "#/components/parameters/date_to"
+          },
+          {
+            "$ref": "#/components/parameters/stock_category"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/stocks"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/stocks"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "stock not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payment": {
+      "get": {
+        "tags": [
+          "payment"
+        ],
+        "summary": "Вызвать оплату",
+        "description": "",
+        "operationId": "getpayment",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/filter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/payments"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/payments"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "payment not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payment/{paymentId}": {
+      "get": {
+        "tags": [
+          "payment"
+        ],
+        "summary": "Вызвать оплату по id",
+        "description": "",
+        "operationId": "getpaymentid",
+        "parameters": [
+          {
+            "name": "paymentId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the payment to fetch",
+            "schema": {
+              "$ref": "#/components/schemas/payment/properties/id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/payment"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/payment"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "payments not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "payment"
+        ],
+        "summary": "Обновить оплату",
+        "operationId": "patchpayment",
+        "parameters": [
+          {
+            "name": "paymentId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the payment to patch",
+            "schema": {
+              "$ref": "#/components/schemas/payment/properties/id"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Оплата, которая должна быть частично изменена",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/payment_rb"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/payment_rb"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/payment"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/payment"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "payment not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "payment"
+        ],
+        "summary": "Удалить оплату",
+        "operationId": "deletepayment",
+        "parameters": [
+          {
+            "name": "paymentId",
+            "in": "path",
+            "required": true,
+            "description": "the id of the payment to delete",
+            "schema": {
+              "$ref": "#/components/schemas/payment/properties/id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "payment not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "sort": {
+        "name": "sort",
+        "in": "query",
+        "description": "Choose the option",
+        "schema": {
+          "$ref": "#/components/schemas/sort"
+        }
+      },
+      "filter": {
+        "name": "filter",
+        "in": "query",
+        "description": "Enter the parameters",
+        "style": "deepObject",
+        "explode": true,
+        "allowReserved": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "date_from": {
+        "name": "date_from",
+        "in": "query",
+        "description": "Enter the date from",
+        "schema": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "date_to": {
+        "name": "date_to",
+        "in": "query",
+        "description": "Enter the date to",
+        "schema": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "stock_category": {
+        "name": "category",
+        "in": "query",
+        "description": "Choose the category",
+        "schema": {
+          "$ref": "#/components/schemas/stock/properties/category"
+        }
+      }
+    },
+    "schemas": {
+      "Order_status": {
+        "type": "string",
+        "enum": [
+          "New",
+          "Paused",
+          "Delivered",
+          "Closed"
+        ]
+      },
+      "Payment_method": {
+        "type": "string",
+        "enum": [
+          "Credit Card",
+          "Cash",
+          "Bank Transfer",
+          "Bank Terminal"
+        ]
+      },
+      "Status": {
+        "type": "string",
+        "enum": [
+          "Active",
+          "Blocked",
+          "Terminated"
+        ]
+      },
+      "sort": {
+        "type": "string",
+        "enum": [
+          "asc",
+          "desc"
+        ],
+        "description": "sort order:\n    * `asc` - Ascending, from A to Z\n    * `desc` - Descending, from Z to A\n    \n"
+      },
+      "Product_category": {
+        "type": "string",
+        "enum": [
+          "product",
+          "topping"
+        ]
+      },
+      "Product_size": {
+        "type": "integer",
+        "enum": [
+          25,
+          35,
+          45
+        ]
+      },
+      "Product_dough": {
+        "type": "string",
+        "enum": [
+          "тонкое",
+          "толстое"
+        ]
+      },
+      "user": {
+        "required": [
+          "id",
+          "name",
+          "lastname",
+          "username",
+          "email",
+          "password",
+          "phone",
+          "payment_address",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "the id of the user",
+            "example": 777
+          },
+          "name": {
+            "type": "string"
+          },
+          "lastname": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string",
+            "description": "the username of the deliveryman",
+            "example": "un"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "format": "password"
+          },
+          "phone": {
+            "type": "integer"
+          },
+          "payment_address": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          }
+        }
+      },
+      "user_rb": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "lastname": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string",
+            "description": "the username of the deliveryman",
+            "example": "un"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "format": "password"
+          },
+          "phone": {
+            "type": "integer"
+          },
+          "payment_address": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          }
+        }
+      },
+      "users": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/user"
+        }
+      },
+      "deliveryman": {
+        "required": [
+          "id",
+          "name",
+          "lastname",
+          "username",
+          "email",
+          "password",
+          "phone",
+          "number_of_deliveries",
+          "salary",
+          "order_id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "the id of the deliveryman",
+            "example": 555
+          },
+          "name": {
+            "type": "string"
+          },
+          "lastname": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string",
+            "description": "the username of the deliveryman",
+            "example": "dm"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "format": "password"
+          },
+          "phone": {
+            "type": "integer"
+          },
+          "number_of_deliveries": {
+            "type": "integer"
+          },
+          "salary": {
+            "type": "integer"
+          },
+          "order_id": {
+            "$ref": "#/components/schemas/order/properties/id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          }
+        }
+      },
+      "deliveryman_rb": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "lastname": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string",
+            "description": "the username of the deliveryman",
+            "example": "dm"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "format": "password"
+          },
+          "phone": {
+            "type": "integer"
+          },
+          "number_of_deliveries": {
+            "type": "integer"
+          },
+          "salary": {
+            "type": "integer"
+          },
+          "order_id": {
+            "$ref": "#/components/schemas/order/properties/id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          }
+        }
+      },
+      "deliverymen": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/deliveryman"
+        }
+      },
+      "chef": {
+        "required": [
+          "id",
+          "name",
+          "lastname",
+          "username",
+          "email",
+          "password",
+          "phone",
+          "number_of_meals_prepared",
+          "salary",
+          "order_id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "the id of the chef",
+            "example": 333
+          },
+          "name": {
+            "type": "string"
+          },
+          "lastname": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string",
+            "description": "the username of the chef",
+            "example": "cf"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "format": "password"
+          },
+          "phone": {
+            "type": "integer"
+          },
+          "number_of_meals_prepared": {
+            "type": "integer"
+          },
+          "salary": {
+            "type": "integer"
+          },
+          "order_id": {
+            "$ref": "#/components/schemas/order/properties/id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          }
+        }
+      },
+      "chef_rb": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "lastname": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string",
+            "description": "the username of the chef",
+            "example": "cf"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "format": "password"
+          },
+          "phone": {
+            "type": "integer"
+          },
+          "number_of_meals_prepared": {
+            "type": "integer"
+          },
+          "salary": {
+            "type": "integer"
+          },
+          "order_id": {
+            "$ref": "#/components/schemas/order/properties/id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          }
+        }
+      },
+      "chefs": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/chef"
+        }
+      },
+      "operator": {
+        "required": [
+          "id",
+          "name",
+          "lastname",
+          "username",
+          "email",
+          "password",
+          "phone",
+          "number_of_calls",
+          "salary",
+          "order_id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "the id of the operator",
+            "example": 789
+          },
+          "name": {
+            "type": "string"
+          },
+          "lastname": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string",
+            "description": "the username of the operator",
+            "example": "op"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "format": "password"
+          },
+          "phone": {
+            "type": "integer"
+          },
+          "number_of_calls": {
+            "type": "integer"
+          },
+          "salary": {
+            "type": "integer"
+          },
+          "order_id": {
+            "$ref": "#/components/schemas/order/properties/id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          }
+        }
+      },
+      "operator_rb": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "lastname": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string",
+            "description": "the username of the operator",
+            "example": "op"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "format": "password"
+          },
+          "phone": {
+            "type": "integer"
+          },
+          "number_of_calls": {
+            "type": "integer"
+          },
+          "salary": {
+            "type": "integer"
+          },
+          "order_id": {
+            "$ref": "#/components/schemas/order/properties/id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          }
+        }
+      },
+      "operators": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/operator"
+        }
+      },
+      "cart": {
+        "required": [
+          "id",
+          "product_id",
+          "topping_id",
+          "user_id",
+          "total_price"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "the id of the cart",
+            "example": 111
+          },
+          "product_id": {
+            "$ref": "#/components/schemas/product/properties/id"
+          },
+          "topping_id": {
+            "$ref": "#/components/schemas/topping/properties/id"
+          },
+          "user_id": {
+            "$ref": "#/components/schemas/user/properties/id"
+          },
+          "total_price": {
+            "type": "integer"
+          }
+        }
+      },
+      "cart_rb": {
+        "properties": {
+          "product_id": {
+            "$ref": "#/components/schemas/product/properties/id"
+          },
+          "topping_id": {
+            "$ref": "#/components/schemas/topping/properties/id"
+          },
+          "user_id": {
+            "$ref": "#/components/schemas/user/properties/id"
+          },
+          "total_price": {
+            "type": "integer"
+          }
+        }
+      },
+      "carts": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/cart"
+        }
+      },
+      "product": {
+        "required": [
+          "id",
+          "name",
+          "size",
+          "dough",
+          "price"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "the id of the cart",
+            "example": 999
+          },
+          "name": {
+            "type": "string"
+          },
+          "size": {
+            "$ref": "#/components/schemas/Product_size"
+          },
+          "dough": {
+            "$ref": "#/components/schemas/Product_dough"
+          },
+          "price": {
+            "type": "integer"
+          }
+        }
+      },
+      "product_rb": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "dough": {
+            "type": "string"
+          },
+          "price": {
+            "type": "integer"
+          }
+        }
+      },
+      "products": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/product"
+        }
+      },
+      "topping": {
+        "required": [
+          "id",
+          "name",
+          "price"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "the id of the cart",
+            "example": 222
+          },
+          "name": {
+            "type": "string"
+          },
+          "price": {
+            "type": "integer"
+          }
+        }
+      },
+      "topping_rb": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "price": {
+            "type": "integer"
+          }
+        }
+      },
+      "toppings": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/topping"
+        }
+      },
+      "order": {
+        "required": [
+          "id",
+          "user_id",
+          "product_id",
+          "payment_id",
+          "topping_id",
+          "cart_id",
+          "time",
+          "price",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "the id of the cart",
+            "example": 123
+          },
+          "user_id": {
+            "$ref": "#/components/schemas/user/properties/id"
+          },
+          "cart_id": {
+            "$ref": "#/components/schemas/cart/properties/id"
+          },
+          "product_id": {
+            "$ref": "#/components/schemas/product/properties/id"
+          },
+          "payment_id": {
+            "$ref": "#/components/schemas/payment/properties/id"
+          },
+          "topping_id": {
+            "$ref": "#/components/schemas/topping/properties/id"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "price": {
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Order_status"
+          }
+        }
+      },
+      "order_rb": {
+        "properties": {
+          "user_id": {
+            "$ref": "#/components/schemas/user/properties/id"
+          },
+          "cart_id": {
+            "$ref": "#/components/schemas/cart/properties/id"
+          },
+          "product_id": {
+            "$ref": "#/components/schemas/product/properties/id"
+          },
+          "payment_id": {
+            "$ref": "#/components/schemas/payment/properties/id"
+          },
+          "topping_id": {
+            "$ref": "#/components/schemas/topping/properties/id"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "price": {
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Order_status"
+          }
+        }
+      },
+      "orders": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/order"
+        }
+      },
+      "stock": {
+        "required": [
+          "name",
+          "category",
+          "number_of_stocks",
+          "date"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "category": {
+            "$ref": "#/components/schemas/Product_category"
+          },
+          "number_of_stocks": {
+            "type": "integer"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "stocks": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/stock"
+        }
+      },
+      "payment": {
+        "required": [
+          "id",
+          "amount",
+          "method",
+          "time"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "the id of the payment",
+            "example": 456
+          },
+          "amount": {
+            "type": "integer"
+          },
+          "method": {
+            "$ref": "#/components/schemas/Payment_method"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "payment_rb": {
+        "properties": {
+          "amount": {
+            "type": "integer"
+          },
+          "method": {
+            "$ref": "#/components/schemas/Payment_method"
+          }
+        }
+      },
+      "payments": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/payment"
+        }
+      },
+      "error": {
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "shield": {
+        "type": "apiKey",
+        "description": "API код для авторизации запросов",
+        "name": "shield",
+        "in": "query"
+      }
+    }
+  }
+}
